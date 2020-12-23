@@ -17,6 +17,7 @@ const Chart = ({
   const {
     derivedMatchData,
     derivedMatchDataAggregates,
+    selectedTeams,
     teams,  
   } = useContext(DataContext)
 
@@ -63,6 +64,7 @@ const Chart = ({
       .data(d3.group(derivedMatchDataAggregates, d => d.teamId))
       .join("path")
         .attr("d", ([, group]) => line(group))
+        .attr("stroke", d => selectedTeams.includes(d[0]) ? '#f00' : '#000')
         .call(path => path.clone(true))
         .attr("stroke", "#fff")
         .attr("stroke-width", 5)
@@ -112,7 +114,7 @@ const Chart = ({
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)
-  }, [derivedMatchData, derivedMatchDataAggregates, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams])
+  }, [derivedMatchData, derivedMatchDataAggregates, selectedTeams, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams])
 
   return (
     <svg ref={svgRef}/>
