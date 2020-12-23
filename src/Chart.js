@@ -116,7 +116,7 @@ const Chart = ({
       .selectAll("text")
       .data(d3.groups(derivedMatchDataAggregates, d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
-        .attr("x", svgMarginLeft - 5)
+        .attr("x", svgMarginLeft - 10)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)
@@ -128,7 +128,7 @@ const Chart = ({
       // reverse because need y position for last entry
       .data(d3.groups([...derivedMatchDataAggregates].reverse(), d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
-        .attr("x", svgWidth - svgMarginRight + 5)
+        .attr("x", svgWidth - svgMarginRight + 10)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)

@@ -1,5 +1,6 @@
 import { CssBaseline, Drawer, makeStyles, TextField } from '@material-ui/core'
 import { useState } from 'react'
+import { useMeasure, useWindowSize } from 'react-use'
 
 import Chart from './Chart'
 import DataContextProvider from './DataContext'
@@ -9,6 +10,9 @@ const App = () => {
   const [season, setSeason] = useState(2020)
   const [slidingWindowSize, setSlidingWindowSize] = useState(34)
   const [selectedTeams, setSelectedTeams] = useState([])
+
+  const {height} = useWindowSize()
+  const [mainRef, {width}] = useMeasure()
 
   const classes = useStyles()
 
@@ -62,8 +66,15 @@ const App = () => {
               value={selectedTeams}
             />
           </Drawer>
-          <main className={classes.content}>
-            <Chart selectedTeams={selectedTeams} />
+          <main className={classes.content} ref={mainRef}>
+            <Chart
+              selectedTeams={selectedTeams}
+              svgHeight={height}
+              svgWidth={width}
+              svgFontSize={12}
+              svgMarginLeft={80}
+              svgMarginRight={80}
+            />
           </main>
         </div>
       </DataContextProvider>
@@ -87,7 +98,6 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
   },
 }))
 
