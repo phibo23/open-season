@@ -67,7 +67,7 @@ const Chart = ({
         .attr("stroke", d => selectedTeams.includes(d[0]) ? '#f00' : '#000')
         .call(path => path.clone(true))
         .attr("stroke", "#fff")
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 2)
 
     // draw background for values
     d3.select(svgRef.current).append("g")
@@ -77,7 +77,7 @@ const Chart = ({
       .join("circle")
         .attr("cx", d => x(d.matchDay))
         .attr("cy", d => y(d.pointsTotal))
-        .attr("r", svgFontSize)
+        .attr("r", svgFontSize-1)
 
     // define format for values
     const formatValue = d3.format(",")
