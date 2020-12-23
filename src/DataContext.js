@@ -1,5 +1,6 @@
-import { createContext, useMemo, useState } from "react"
+import { createContext, useMemo } from "react"
 import { useAsync } from "react-use"
+import { calculatePoints, getFinalResult, getResultType, isMatchHome } from "./openLigaDB"
 
 export const DataContext = createContext({})
 
@@ -8,8 +9,6 @@ const DataContextProvider = ({
   season,
   slidingWindowSize,
 }) => {
-  const [selectedTeam, setSelectedTeam] = useState(null)
-
   const teams = useAsync(async () => {
     const response = await fetch(`https://www.openligadb.de/api/getavailableteams/bl1/${season}`)
     return response.json()
@@ -20,60 +19,61 @@ const DataContextProvider = ({
     return response.json()
   }, [season])
 
-  const teamMatches = useMemo(() => {
-    return matches.value?.filter((m) => {
-      return (m.Team1.TeamId === selectedTeam || m.Team2.TeamId === selectedTeam) && m.MatchIsFinished
-    })
-  }, [matches, selectedTeam])
+  const derivedMatchData = useMemo(() => {
+    return matches.value
+      // filter out unfinished matches
+      ?.filter(m => m.MatchIsFinished === true)
+      // flatMap enables returning multiple values for each entry in original array
+      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap
+      ?.flatMap((m, index, array) => {
+        // create one value for each team in match
+        return [m.Team1, m.Team2].map((t) => {
+          const isHome = isMatchHome(m, t.TeamId)
+          const result = getFinalResult(m)
+          const resultType = getResultType(result)
+          const points = calculatePoints(resultType, isHome)
 
-  const teamDerivedData = useMemo(() => {
-    return teamMatches?.map((tm) => {
-      const isHome = tm?.Team1.TeamId === selectedTeam
-      const result = tm?.MatchResults?.find((mr) => mr?.ResultTypeID === 2)
-      // https://stackoverflow.com/a/34852894
-      const resultType = result && Math.sign(result.PointsTeam1 - result.PointsTeam2)
-      let points = 0
-      if ((resultType === 1 && isHome) || (resultType === -1 && !isHome)) {
-        points = 3
-      } else if (resultType === 0) {
-        points = 1
-      }
-      return {
-        dateTime: new Date(tm?.MatchDateTimeUTC),
-        goalsAgainst: isHome ? result?.PointsTeam2 : result?.PointsTeam1,
-        goalsFor: isHome ? result?.PointsTeam1 : result?.PointsTeam2,
-        isHome,
-        matchDay: tm?.Group.GroupOrderID,
-        opponentId: isHome ? tm?.Team2.TeamId : tm?.Team1.TeamId,
-        points,
-      }
+          return {
+            dateTime: new Date(m?.MatchDateTimeUTC),
+            goalsAgainst: isHome ? result?.PointsTeam2 : result?.PointsTeam1,
+            goalsFor: isHome ? result?.PointsTeam1 : result?.PointsTeam2,
+            isHome,
+            matchDay: m?.Group.GroupOrderID,
+            opponentId: isHome ? m?.Team2.TeamId : m?.Team1.TeamId,
+            points,
+            teamId: isHome ? m?.Team1.TeamId : m?.Team2.TeamId,
+          }
+        })
     }) ?? []
-  }, [selectedTeam, teamMatches])
+  }, [matches.value])
 
-  const teamDerivedDataAggregates = useMemo(() => {
-    return teamDerivedData?.map((tdd, index, array) => {
+  const derivedMatchDataAggregates = useMemo(() => {
+    return derivedMatchData?.map((dmd, index, array) => {
+      const pointsTotal = array
+        // find all entries that belong to current team
+        .filter(i => i.teamId === dmd.teamId)
+        // slice to sliding window size
+        .slice(Math.max(0, dmd.matchDay-slidingWindowSize), dmd.matchDay)
+        // sum up points
+        .reduce((a, c, index, array) => a + c.points, 0)
       return {
-        ...tdd,
-        pointsTotal: array.slice(Math.max(0, index-slidingWindowSize), index).reduce((a,c) => a + c.points, 0)
+        ...dmd,
+        pointsTotal
       }
     })
-  }, [slidingWindowSize, teamDerivedData])
+  }, [derivedMatchData, slidingWindowSize])
 
   const data = useMemo(() => {
     return {
       season,
-      selectedTeam,
-      teamDerivedData,
-      teamDerivedDataAggregates,
+      derivedMatchData,
+      derivedMatchDataAggregates,
       teams,
     }
-  }, [season, selectedTeam, teamDerivedData, teamDerivedDataAggregates, teams])
+  }, [derivedMatchData, derivedMatchDataAggregates, season, teams])
 
   return (
     <DataContext.Provider value={data}>
-      <select onChange={(e) => { setSelectedTeam(parseInt(e.target.value, 10)) }}>
-        { data.teams.value?.map((t) => <option key={t?.TeamId} value={t?.TeamId}>{t?.TeamName}</option>)}
-      </select>
       {children}
     </DataContext.Provider>
   )

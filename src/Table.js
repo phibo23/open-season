@@ -4,7 +4,7 @@ import { DataContext } from "./DataContext"
 const Table = () => {
   const {
     season,
-    teamDerivedData,
+    derivedMatchData,
     teams,
   } = useContext(DataContext)
   return (
@@ -20,16 +20,16 @@ const Table = () => {
         </tr>
       </thead>
       <tbody>
-        { teamDerivedData?.map((tdd) => {
-          const opponent = teams.value?.find(t => t.TeamId === tdd.opponentId)
+        { derivedMatchData?.map((dmd) => {
+          const opponent = teams.value?.find(t => t.TeamId === dmd.opponentId)
           return (
-            <tr key={`${season}_${tdd.opponentId}_${tdd.isHome}`}>
-              <td>{tdd.matchDay}</td>
-              <td>{tdd.dateTime.toLocaleString()}</td>
-              <td>{tdd.isHome ? 'H' : 'A'} {opponent?.TeamName}</td>
-              <td>{tdd.goalsFor}</td>
-              <td>{tdd.goalsAgainst}</td>
-              <td>{tdd.points}</td>
+            <tr key={`${season}_${dmd.opponentId}_${dmd.isHome}`}>
+              <td>{dmd.matchDay}</td>
+              <td>{dmd.dateTime.toLocaleString()}</td>
+              <td>{dmd.isHome ? 'H' : 'A'} {opponent?.TeamName}</td>
+              <td>{dmd.goalsFor}</td>
+              <td>{dmd.goalsAgainst}</td>
+              <td>{dmd.points}</td>
             </tr>
           )
         })}

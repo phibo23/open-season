@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-import Table from './Table'
 import Chart from './Chart'
 import DataContextProvider from './DataContext'
 
@@ -17,7 +16,6 @@ const App = () => {
         slidingWindowSize={slidingWindowSize}
       >
         <Chart />
-        <Table />
       </DataContextProvider>
     </div>
   )

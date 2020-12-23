@@ -15,9 +15,8 @@ const Chart = ({
   svgWidth,
 }) => {
   const {
-    selectedTeam,
-    teamDerivedData,
-    teamDerivedDataAggregates,
+    derivedMatchData,
+    derivedMatchDataAggregates,
     teams,  
   } = useContext(DataContext)
 
@@ -32,12 +31,12 @@ const Chart = ({
 
     // scale x
     const x = d3.scalePoint()
-      .domain(teamDerivedDataAggregates?.map((tdd) => tdd.matchDay))
+      .domain(derivedMatchDataAggregates?.map((dmd) => dmd.matchDay))
       .range([svgMarginLeft, svgWidth - svgMarginRight])
 
     // scale y
     const y = d3.scaleLinear()
-      .domain(d3.extent(teamDerivedDataAggregates, d => d.pointsTotal))
+      .domain(d3.extent(derivedMatchDataAggregates, d => d.pointsTotal))
       .range([svgHeight - svgMarginBottom, svgMarginTop])
 
     // define x axis
@@ -61,7 +60,7 @@ const Chart = ({
         .attr("fill", "none")
         .attr("stroke", "#000")
       .selectAll("path")
-      .data(d3.group(teamDerivedDataAggregates, d => selectedTeam))
+      .data(d3.group(derivedMatchDataAggregates, d => d.teamId))
       .join("path")
         .attr("d", ([, group]) => line(group))
         .call(path => path.clone(true))
@@ -72,7 +71,7 @@ const Chart = ({
     d3.select(svgRef.current).append("g")
         .attr("fill", "#fff")
       .selectAll("circle")
-      .data(teamDerivedDataAggregates)
+      .data(derivedMatchDataAggregates)
       .join("circle")
         .attr("cx", d => x(d.matchDay))
         .attr("cy", d => y(d.pointsTotal))
@@ -85,7 +84,7 @@ const Chart = ({
     d3.select(svgRef.current).append("g")
         .attr("text-anchor", "middle")
       .selectAll("text")
-      .data(teamDerivedDataAggregates)
+      .data(derivedMatchDataAggregates)
       .join("text")
         .attr("x", d => x(d.matchDay))
         .attr("y", d => y(d.pointsTotal))
@@ -96,7 +95,7 @@ const Chart = ({
     d3.select(svgRef.current).append("g")
         .attr("text-anchor", "end")
       .selectAll("text")
-      .data(d3.groups(teamDerivedDataAggregates, d => teams.value?.find(t => t.TeamId === selectedTeam)?.ShortName))
+      .data(d3.groups(derivedMatchDataAggregates, d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
         .attr("x", svgMarginLeft - 12)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
@@ -107,13 +106,13 @@ const Chart = ({
     d3.select(svgRef.current).append("g")
         .attr("text-anchor", "end")
       .selectAll("text")
-      .data(d3.groups([...teamDerivedDataAggregates].reverse(), d => teams.value?.find(t => t.TeamId === selectedTeam)?.ShortName))
+      .data(d3.groups([...derivedMatchDataAggregates].reverse(), d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
         .attr("x", svgWidth - 12)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)
-  }, [selectedTeam, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams, teamDerivedData, teamDerivedDataAggregates])
+  }, [derivedMatchData, derivedMatchDataAggregates, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams])
 
   return (
     <svg ref={svgRef}/>
