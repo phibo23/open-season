@@ -41,19 +41,20 @@ const DataContextProvider = ({
             matchDay: m?.Group.GroupOrderID,
             opponentId: isHome ? m?.Team2.TeamId : m?.Team1.TeamId,
             points,
+            season,
             teamId: isHome ? m?.Team1.TeamId : m?.Team2.TeamId,
           }
         })
     }) ?? []
-  }, [matches.value])
+  }, [matches.value, season])
 
   const derivedMatchDataAggregates = useMemo(() => {
     return derivedMatchData?.map((dmd, index, array) => {
       const pointsTotal = array
         // find all entries that belong to current team
-        .filter(i => i.teamId === dmd.teamId)
+        .filter(i => i.teamId === dmd.teamId && i.matchDay <= dmd.matchDay)
         // slice to sliding window size
-        .slice(Math.max(0, dmd.matchDay-slidingWindowSize), dmd.matchDay)
+        .slice(0-slidingWindowSize)
         // sum up points
         .reduce((a, c, index, array) => a + c.points, 0)
       return {
