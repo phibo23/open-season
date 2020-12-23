@@ -10,7 +10,7 @@ export const getFinalResult = (match) => {
 export const getResultType = (result) => {
   // determine if home or away team won or draw
   // https://stackoverflow.com/a/34852894
-  return Math.sign(result.PointsTeam1 - result.PointsTeam2)
+  return result && Math.sign(result.PointsTeam1 - result.PointsTeam2)
 }
 
 export const calculatePoints = (resultType, isHome) => {

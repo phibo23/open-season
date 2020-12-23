@@ -19,8 +19,21 @@ const DataContextProvider = ({
     return response.json()
   }, [season])
 
+  const seasonId = useMemo(() => {
+    return matches.value?.[0].LeagueId
+  }, [matches.value])
+
+  const matchesPreviousSeason = useAsync(async () => {
+    const response = await fetch(`https://www.openligadb.de/api/getmatchdata/bl1/${season-1}`)
+    return response.json()
+  }, [season])
+
   const derivedMatchData = useMemo(() => {
-    return matches.value
+    // merge matches of previous season to enable cross season aggregate statistics
+    return [
+      ...matchesPreviousSeason.value ?? [],
+      ...matches.value ?? [],
+    ]
       // filter out unfinished matches
       ?.filter(m => m.MatchIsFinished === true)
       // flatMap enables returning multiple values for each entry in original array
@@ -41,28 +54,32 @@ const DataContextProvider = ({
             matchDay: m?.Group.GroupOrderID,
             opponentId: isHome ? m?.Team2.TeamId : m?.Team1.TeamId,
             points,
-            season,
+            seasonId: m.LeagueId,
             teamId: isHome ? m?.Team1.TeamId : m?.Team2.TeamId,
           }
         })
     }) ?? []
-  }, [matches.value, season])
+  }, [matches.value, matchesPreviousSeason.value])
 
   const derivedMatchDataAggregates = useMemo(() => {
-    return derivedMatchData?.map((dmd, index, array) => {
-      const pointsTotal = array
-        // find all entries that belong to current team
-        .filter(i => i.teamId === dmd.teamId && i.matchDay <= dmd.matchDay)
-        // slice to sliding window size
-        .slice(0-slidingWindowSize)
-        // sum up points
-        .reduce((a, c, index, array) => a + c.points, 0)
-      return {
-        ...dmd,
-        pointsTotal
-      }
-    })
-  }, [derivedMatchData, slidingWindowSize])
+    return derivedMatchData
+      ?.map((dmd, index, array) => {
+        const pointsTotal = array
+          // cut off everything newer than current index
+          .slice(0, index+1)
+          // find all entries that belong to current team
+          .filter(i => i.teamId === dmd.teamId)
+          // slice to sliding window size
+          .slice(0-slidingWindowSize)
+          // sum up points
+          .reduce((a, c, index, array) => a + c.points, 0)
+        return {
+          ...dmd,
+          pointsTotal
+        }
+      })
+      .filter((dmd) => dmd.seasonId === seasonId)
+  }, [derivedMatchData, seasonId, slidingWindowSize])
 
   const [selectedTeams, setSelectedTeams] = useState([])
 
