@@ -25,7 +25,7 @@ const App = ({
 
   const teamMatches = useMemo(() => {
     return matches.value?.filter((m) => {
-      return m.Team1.TeamId === selectedTeam || m.Team2.TeamId === selectedTeam
+      return (m.Team1.TeamId === selectedTeam || m.Team2.TeamId === selectedTeam) && m.MatchIsFinished
     })
   }, [matches, selectedTeam])
 
@@ -57,7 +57,7 @@ const App = ({
     return teamDerivedData?.map((tdd, index, array) => {
       return {
         ...tdd,
-        pointsTotal: array.slice(0, index).reduce((a,c) => a + c.points, 0)
+        pointsTotal: array.slice(Math.max(0, index-5), index).reduce((a,c) => a + c.points, 0)
       }
     })
   }, [teamDerivedData])
