@@ -4,9 +4,9 @@ import { useAsync } from 'react-use'
 import Table from './Table'
 import Chart from './Chart'
 
-const App = ({
-  season,
-}) => {
+const App = () => {
+  const [season, setSeason] = useState('2020')
+
   const teams = useAsync(async () => {
     const response = await fetch(`https://www.openligadb.de/api/getavailableteams/bl1/${season}`)
     return response.json()
@@ -49,37 +49,37 @@ const App = ({
     }) ?? []
   }, [selectedTeam, teamMatches])
 
+  const [slidingWindowSize, setSlidingWindowSize] = useState(5)
+
   const teamDerivedDataAggregates = useMemo(() => {
     return teamDerivedData?.map((tdd, index, array) => {
       return {
         ...tdd,
-        pointsTotal: array.slice(Math.max(0, index-5), index).reduce((a,c) => a + c.points, 0)
+        pointsTotal: array.slice(Math.max(0, index-slidingWindowSize), index).reduce((a,c) => a + c.points, 0)
       }
     })
-  }, [teamDerivedData])
+  }, [slidingWindowSize, teamDerivedData])
 
   return (
     <div>
+      <input type='text' onBlur={(e) => { setSeason(e.target.value) }} placeholder={season} />
+      <input type='number' min={5} max={34} onChange={(e) => { setSlidingWindowSize(parseInt(e.target.value)) }} placeholder={slidingWindowSize} />
       <select onChange={(e) => { setSelectedTeam(parseInt(e.target.value, 10)) }}>
         { teams.value?.map((t) => <option key={t?.TeamId} value={t?.TeamId}>{t?.TeamName}</option>)}
       </select>
-      <Table
-        season={season}
-        teamDerivedData={teamDerivedData}
-        teams={teams}
-      />
       <Chart
         selectedTeam={selectedTeam}
         teamDerivedData={teamDerivedData}
         teamDerivedDataAggregates={teamDerivedDataAggregates}
         teams={teams}
       />
+      <Table
+        season={season}
+        teamDerivedData={teamDerivedData}
+        teams={teams}
+      />
     </div>
   )
-}
-
-App.defaultProps = {
-  season: '2020',
 }
 
 export default App

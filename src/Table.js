@@ -22,7 +22,7 @@ const Table = ({
             <tr key={`${season}_${tdd.opponentId}_${tdd.isHome}`}>
               <td>{tdd.matchDay}</td>
               <td>{tdd.dateTime.toLocaleString()}</td>
-              <td>{tdd.isHome ? 'H' : 'A'} {opponent.TeamName}</td>
+              <td>{tdd.isHome ? 'H' : 'A'} {opponent?.TeamName}</td>
               <td>{tdd.goalsFor}</td>
               <td>{tdd.goalsAgainst}</td>
               <td>{tdd.points}</td>
