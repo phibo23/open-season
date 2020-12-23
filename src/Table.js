@@ -1,8 +1,12 @@
-const Table = ({
-  season,
-  teamDerivedData,
-  teams,
-}) => {
+import { useContext } from "react"
+import { DataContext } from "./DataContext"
+
+const Table = () => {
+  const {
+    season,
+    teamDerivedData,
+    teams,
+  } = useContext(DataContext)
   return (
     <table>
       <thead>

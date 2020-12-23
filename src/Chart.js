@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react"
+import { useContext, useEffect, useRef } from "react"
 import * as d3 from 'd3'
+import { DataContext } from "./DataContext"
 
 /**
  * based on https://observablehq.com/@mbostock/cancer-survival-rates
  */
 const Chart = ({
-  selectedTeam,
   svgFontSize,
   svgHeight,
   svgMarginBottom,
@@ -13,10 +13,14 @@ const Chart = ({
   svgMarginRight,
   svgMarginTop,
   svgWidth,
-  teamDerivedData,
-  teamDerivedDataAggregates,
-  teams,
 }) => {
+  const {
+    selectedTeam,
+    teamDerivedData,
+    teamDerivedDataAggregates,
+    teams,  
+  } = useContext(DataContext)
+
   const svgRef = useRef(null)
   useEffect(() => {
     // setup svg
