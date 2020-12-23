@@ -97,7 +97,7 @@ const DataContextProvider = ({
     <DataContext.Provider value={data}>
       <select multiple onChange={(e) => { setSelectedTeams(Array.from(e.target.selectedOptions, option => parseInt(option.value, 10))) }} size={18}>
         {teams.value?.map(t => (
-          <option key={t.TeamId} value={t.TeamId}>{t.ShortName}</option>
+          <option key={t.TeamId} value={t.TeamId}>{t.ShortName || t.TeamName}</option>
         ))}
       </select>
       {children}

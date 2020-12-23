@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from "react"
+import { useContext, useEffect, useMemo, useRef } from "react"
 import * as d3 from 'd3'
 import { DataContext } from "./DataContext"
 
@@ -20,6 +20,10 @@ const Chart = ({
     selectedTeams,
     teams,  
   } = useContext(DataContext)
+
+  const derivedMatchDataAggregatesSelectedTeams = useMemo(() => {
+    return derivedMatchDataAggregates.filter(dmd => selectedTeams.includes(dmd.teamId))
+  }, [derivedMatchDataAggregates, selectedTeams])
 
   const svgRef = useRef(null)
   useEffect(() => {
@@ -56,24 +60,37 @@ const Chart = ({
       .x(d => x(d.matchDay))
       .y(d => y(d.pointsTotal))
     
-    // draw lines
+    // draw lines for unselected teams
     d3.select(svgRef.current).append('g')
         .attr("fill", "none")
         .attr("stroke", "#000")
       .selectAll("path")
-      .data(d3.group(derivedMatchDataAggregates, d => d.teamId))
+      .data(d3.group(derivedMatchDataAggregates.filter(dmd => !selectedTeams.includes(dmd.teamId)), d => d.teamId))
       .join("path")
         .attr("d", ([, group]) => line(group))
-        .attr("stroke", d => selectedTeams.includes(d[0]) ? '#f00' : '#000')
+        .attr("stroke", '#aaa')
         .call(path => path.clone(true))
         .attr("stroke", "#fff")
         .attr("stroke-width", 2)
 
+    // draw lines for selected teams afterwards so they are displayed on top
+    d3.select(svgRef.current).append('g')
+        .attr("fill", "none")
+        .attr("stroke", "#000")
+      .selectAll("path")
+      .data(d3.group(derivedMatchDataAggregatesSelectedTeams, d => d.teamId))
+      .join("path")
+        .attr("d", ([, group]) => line(group))
+        .attr("stroke", '#f00')
+        .call(path => path.clone(true))
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 2)
+  
     // draw background for values
     d3.select(svgRef.current).append("g")
         .attr("fill", "#fff")
       .selectAll("circle")
-      .data(derivedMatchDataAggregates)
+      .data(derivedMatchDataAggregatesSelectedTeams)
       .join("circle")
         .attr("cx", d => x(d.matchDay))
         .attr("cy", d => y(d.pointsTotal))
@@ -86,7 +103,7 @@ const Chart = ({
     d3.select(svgRef.current).append("g")
         .attr("text-anchor", "middle")
       .selectAll("text")
-      .data(derivedMatchDataAggregates)
+      .data(derivedMatchDataAggregatesSelectedTeams)
       .join("text")
         .attr("x", d => x(d.matchDay))
         .attr("y", d => y(d.pointsTotal))
@@ -99,22 +116,23 @@ const Chart = ({
       .selectAll("text")
       .data(d3.groups(derivedMatchDataAggregates, d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
-        .attr("x", svgMarginLeft - 12)
+        .attr("x", svgMarginLeft - 5)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)
 
     // draw labels right
     d3.select(svgRef.current).append("g")
-        .attr("text-anchor", "end")
+        .attr("text-anchor", "start")
       .selectAll("text")
+      // reverse because need y position for last entry
       .data(d3.groups([...derivedMatchDataAggregates].reverse(), d => teams.value?.find(t => t.TeamId === d.teamId)?.ShortName))
       .join("text")
-        .attr("x", svgWidth - 12)
+        .attr("x", svgWidth - svgMarginRight + 5)
         .attr("y", ([key, [d]]) => y(d.pointsTotal) + (key === "Colon") * 10)
         .attr("dy", "0.35em")
         .text(([key]) => key)
-  }, [derivedMatchData, derivedMatchDataAggregates, selectedTeams, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams])
+  }, [derivedMatchData, derivedMatchDataAggregates, derivedMatchDataAggregatesSelectedTeams, selectedTeams, svgFontSize, svgHeight, svgMarginBottom, svgMarginLeft, svgMarginRight, svgMarginTop, svgWidth, teams])
 
   return (
     <svg ref={svgRef}/>
@@ -125,8 +143,8 @@ Chart.defaultProps = {
   svgFontSize: 5,
   svgHeight: 200,
   svgMarginBottom: 20,
-  svgMarginLeft: 60,
-  svgMarginRight: 60,
+  svgMarginLeft: 40,
+  svgMarginRight: 40,
   svgMarginTop: 40,
   svgWidth: 500,
 }
