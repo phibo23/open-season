@@ -6,6 +6,7 @@ import { DataContext } from "./DataContext"
  * based on https://observablehq.com/@mbostock/cancer-survival-rates
  */
 const Chart = ({
+  selectedTeams,
   svgFontSize,
   svgHeight,
   svgMarginBottom,
@@ -17,7 +18,6 @@ const Chart = ({
   const {
     derivedMatchData,
     derivedMatchDataAggregates,
-    selectedTeams,
     teams,  
   } = useContext(DataContext)
 

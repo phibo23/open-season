@@ -1,4 +1,4 @@
-import { createContext, useMemo, useState } from "react"
+import { createContext, useMemo } from "react"
 import { useAsync } from "react-use"
 import { calculatePoints, getFinalResult, getResultType, isMatchHome } from "./openLigaDB"
 
@@ -81,25 +81,17 @@ const DataContextProvider = ({
       .filter((dmd) => dmd.seasonId === seasonId)
   }, [derivedMatchData, seasonId, slidingWindowSize])
 
-  const [selectedTeams, setSelectedTeams] = useState([])
-
   const data = useMemo(() => {
     return {
       season,
-      selectedTeams,
       derivedMatchData,
       derivedMatchDataAggregates,
       teams,
     }
-  }, [derivedMatchData, derivedMatchDataAggregates, season, selectedTeams, teams])
+  }, [derivedMatchData, derivedMatchDataAggregates, season, teams])
 
   return (
     <DataContext.Provider value={data}>
-      <select multiple onChange={(e) => { setSelectedTeams(Array.from(e.target.selectedOptions, option => parseInt(option.value, 10))) }} size={18}>
-        {teams.value?.map(t => (
-          <option key={t.TeamId} value={t.TeamId}>{t.ShortName || t.TeamName}</option>
-        ))}
-      </select>
       {children}
     </DataContext.Provider>
   )
