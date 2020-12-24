@@ -1,4 +1,4 @@
-import { CssBaseline, Drawer, makeStyles, TextField } from '@material-ui/core'
+import { CssBaseline, Drawer, Link, makeStyles, TextField } from '@material-ui/core'
 import { useState } from 'react'
 import { useMeasure, useWindowSize } from 'react-use'
 
@@ -65,6 +65,9 @@ const App = () => {
               }}
               value={selectedTeams}
             />
+            <footer className={classes.footer}>
+              <Link href='https://github.com/phibo23/open-season' target='_blank' variant='caption'>github.com/phibo23/open-season</Link>
+            </footer>
           </Drawer>
           <main className={classes.content} ref={mainRef}>
             <Chart
@@ -99,6 +102,10 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
   },
+  footer: {
+    position: 'absolute',
+    bottom: 0
+  }
 }))
 
 export default App
