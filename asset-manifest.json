@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/open-season/static/css/main.6dea0f05.chunk.css",
+    "main.js": "/open-season/static/js/main.db963fbd.chunk.js",
+    "main.js.map": "/open-season/static/js/main.db963fbd.chunk.js.map",
+    "runtime-main.js": "/open-season/static/js/runtime-main.49e412af.js",
+    "runtime-main.js.map": "/open-season/static/js/runtime-main.49e412af.js.map",
+    "static/js/2.e78f1fc2.chunk.js": "/open-season/static/js/2.e78f1fc2.chunk.js",
+    "static/js/2.e78f1fc2.chunk.js.map": "/open-season/static/js/2.e78f1fc2.chunk.js.map",
+    "static/js/3.b36d7c02.chunk.js": "/open-season/static/js/3.b36d7c02.chunk.js",
+    "static/js/3.b36d7c02.chunk.js.map": "/open-season/static/js/3.b36d7c02.chunk.js.map",
+    "index.html": "/open-season/index.html",
+    "static/css/main.6dea0f05.chunk.css.map": "/open-season/static/css/main.6dea0f05.chunk.css.map",
+    "static/js/2.e78f1fc2.chunk.js.LICENSE.txt": "/open-season/static/js/2.e78f1fc2.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.49e412af.js",
+    "static/js/2.e78f1fc2.chunk.js",
+    "static/css/main.6dea0f05.chunk.css",
+    "static/js/main.db963fbd.chunk.js"
+  ]
+}
