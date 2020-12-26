@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/open-season/static/css/main.6dea0f05.chunk.css",
-    "main.js": "/open-season/static/js/main.607247b0.chunk.js",
-    "main.js.map": "/open-season/static/js/main.607247b0.chunk.js.map",
+    "main.js": "/open-season/static/js/main.2e3195ad.chunk.js",
+    "main.js.map": "/open-season/static/js/main.2e3195ad.chunk.js.map",
     "runtime-main.js": "/open-season/static/js/runtime-main.9645c7fd.js",
     "runtime-main.js.map": "/open-season/static/js/runtime-main.9645c7fd.js.map",
     "static/js/2.35f679da.chunk.js": "/open-season/static/js/2.35f679da.chunk.js",
@@ -10,6 +10,8 @@
     "static/js/3.1b76004a.chunk.js": "/open-season/static/js/3.1b76004a.chunk.js",
     "static/js/3.1b76004a.chunk.js.map": "/open-season/static/js/3.1b76004a.chunk.js.map",
     "index.html": "/open-season/index.html",
+    "service-worker.js": "/open-season/service-worker.js",
+    "service-worker.js.map": "/open-season/service-worker.js.map",
     "static/css/main.6dea0f05.chunk.css.map": "/open-season/static/css/main.6dea0f05.chunk.css.map",
     "static/js/2.35f679da.chunk.js.LICENSE.txt": "/open-season/static/js/2.35f679da.chunk.js.LICENSE.txt"
   },
@@ -17,6 +19,6 @@
     "static/js/runtime-main.9645c7fd.js",
     "static/js/2.35f679da.chunk.js",
     "static/css/main.6dea0f05.chunk.css",
-    "static/js/main.607247b0.chunk.js"
+    "static/js/main.2e3195ad.chunk.js"
   ]
 }
