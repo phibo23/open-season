@@ -11,7 +11,7 @@ import { clientsClaim } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
 clientsClaim();
 
@@ -70,3 +70,36 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+
+// the following routes are for caching openligadb responses
+// because they unfortunately have some weird headers which prevent "normal" browser caching.
+// these use regular expression matching https://developers.google.com/web/tools/workbox/modules/workbox-routing#how_to_register_a_regular_expression_route
+// the cache first strategy https://developers.google.com/web/tools/workbox/modules/workbox-strategies#cache_first_cache_falling_back_to_network
+// and expiration by max age https://developers.google.com/web/tools/workbox/modules/workbox-expiration#restrict_the_age_of_cached_entries 
+
+// implements a 12h cache for openligadb data of current season
+// (order is important here since the other registerRoute has a more general RegExp!)
+registerRoute(
+  new RegExp('https://www\\.openligadb\\.de/api/getmatchdata/.*/2020'),
+  new CacheFirst({
+    cacheName: 'openligadb-short',
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 12 * 60 * 60,
+      }),
+    ],
+  })
+)
+
+// implements a one month cache for general openligadb data 
+registerRoute(
+  new RegExp('https://www\\.openligadb\\.de/api/.*'),
+  new CacheFirst({
+    cacheName: 'openligadb-long',
+    plugins: [
+      new ExpirationPlugin({
+        maxAgeSeconds: 30 * 24 * 60 * 60,
+      }),
+    ],
+  })
+)
