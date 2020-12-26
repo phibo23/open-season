@@ -1,14 +1,14 @@
-# This is a basic workflow to help you get started with Actions
+# This is based on the a basic workflow example by github
 
-name: CI
+name: CI/CD
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push ~or pull request~ events but only for the master branch
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -25,12 +25,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # setup node with correct version
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2.1.4
+        with:
+          node-version: 14.x
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: install dependencies
+        run: npm install
+
+      # builds and deploys using gh-pages
+      # based on https://github.com/tschaub/gh-pages/pull/368
+      - name: Deploy with gh-pages
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+          npm run deploy -- -u "github-actions-bot <support+actions@github.com>"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
